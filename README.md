@@ -5,24 +5,42 @@
 def self.predict(key)
 ```
 输入的key包括星期几以及教室范围
+
 例：“星期一 J3-205”
 ```ruby
   dict3={"一"=>"mon","二"=>"tue","三"=>"wed","四"=>"thr","五"=>"fri"}
   if (key=~/[一二三四五]/).nil?
     return nil
   else
+```
+如果输入中不包括”一二三四五“这五个字符中的任意一个则返回nil
+```ruby
     keyarr=key.split(" ")
     for keyword in keyarr
       unless keyword.include? "星期"
         key2=keyword
       end
     end
+```
+keyarr是把key以” “（即空格）分开成若干部分作为元素的数组，
+再把不包含星期的那个元素赋值给key2
+
+也就是说，key2是教室范围
+```ruby
     hashes={}
     @rooms=[]
     @strs=[]
+```
+定义一个散列和两个数组，为后面做准备
+```ruby
     if key2.nil?
       key2=""
     end
+```
+如果key2为空，即没有输入教室范围，则定义key2为一个没有内容的字符串
+
+在之后的搜索中，既然key2没有内容，就会匹配所有教室
+```ruby    
     Room.all.each do |r|
       if r.class_id.include? key2
         target=eval('r.'+dict3[key[key=~/["一二三四五"]/]])
