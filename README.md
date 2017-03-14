@@ -133,3 +133,41 @@ keyarr是把key以” “（即空格）分开成若干部分作为元素的数�
   end
 end
 ```
+###匹配模型
+```ruby
+def match
+  dict=Hash.new {'noinfo'}
+  dict={1=>"mon",2=>"tue",3=>"wed",4=>"thr",5=>"fri"}
+  dict2={"12"=>"上午","34"=>"下午","56"=>"晚上"}
+```
+新建两个散列来分别表示周几和时间段
+```ruby
+  h=Time.new.hour
+  if h<12
+    str="12"
+    #早上
+  elsif h<18
+    str="34"
+    #下午
+  else
+    str="56"
+    #晚上
+  end
+```
+根据现在的时间给一个新字符串str赋值，分别对应dict2中的上午下午晚上
+```ruby
+  if eval('self.'+dict[Time.new.wday]).nil?
+    return "全天空闲"
+  elsif ((eval('self.'+dict[Time.new.wday]))=~/["#{str}"]/).nil?
+    return dict2["#{str}"]+"空闲"
+  elsif eval('self.'+dict[Time.new.wday]).include? str
+    return dict2["#{str}"]+"满课"
+  elsif eval('self.'+dict[Time.new.wday]).include? str[0]
+    return "第"+str[1]+"节空闲"
+  elsif eval('self.'+dict[Time.new.wday]).include? str[1]
+    return "第"+str[0]+"节空闲"
+  end
+
+end
+```
+通过str中的字符和数据库中教室当天课表匹配来确认当天的时间段里哪些课空闲并返回
