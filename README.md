@@ -170,4 +170,69 @@ def match
 
 end
 ```
-通过str中的字符和数据库中教室当天课表匹配来确认当天的时间段里哪些课空闲并返回
+通过str中的字符和数据库中教室当天课表匹配来确认当天的时间段里哪些课空闲并返回相应的语句
+###resort模型
+```ruby
+def self.resort(rooms)#按照时间点和教室id排序
+  dict=Hash.new {'noinfo'}
+  dict={1=>"mon",2=>"tue",3=>"wed",4=>"thr",5=>"fri"}
+```
+新建变量dict为散列
+```ruby
+  h=Time.new.hour
+```
+新建变量h并把当前的时间（单位为小时）赋值给他
+```ruby
+  if h<12
+    str="12"#早上
+  elsif h<18
+    str="34"#下午
+  else
+    str="56"#晚上
+  end
+```
+根据当前的时间为新建变量str赋值
+```ruby
+  @room0=[]#接受全天空闲教室
+  @room1=[]#接受时间段内全空闲教室
+  @room2=[]#有空闲教室
+  @room3=[]#无空闲教室
+```
+新建四个空数组
+```ruby
+  rooms.each do |r|
+```
+对输入的所有的room都做以下操作（就是都检索一遍）
+```ruby
+    if eval('r.'+dict[Time.new.wday]).nil?
+      @room0<<r#上述代码周六日测试时会有bug
+```
+如果教室当天的课是空的话就在room0数组里添加此教室
+```ruby
+    elsif ((eval('r.'+dict[Time.new.wday]))=~/["#{str}"]/).nil?
+      @room1=@room1<<r
+```
+如果教室当天在现在这个时间段是空的话就在room1数组里添加此教室
+```ruby
+    elsif eval('r.'+dict[Time.new.wday]).include? str
+      @room3=@room3<<r
+```
+如果当天的教室在这个时间段有课就在room3数组里添加此教室
+```ruby
+    else
+      @room2<<r
+    end
+  end
+```
+再不然就在room2数组里添加此教室。
+```ruby
+  @room0.sort_by!{|e| e.class_id}
+  @room1.sort_by!{|e| e.class_id}
+  @room2.sort_by!{|e| e.class_id}
+  @room3.sort_by!{|e| e.class_id}
+  return @room0+@room1+@room2+@room3
+end
+```
+分别将room0,room1,room2,room3中的元素按照id的顺序排序
+
+再分别将这四个数组返回。
